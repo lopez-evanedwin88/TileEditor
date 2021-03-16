@@ -71,22 +71,23 @@ Game.init = function () {
 };
 
 Game.update = function () {
-    // handle hero movement with arrow keys
     const coord = Mouse.isClicked();
+    var layer = map.getTile(1, map.getCol(coord.x), map.getRow(coord.y)) !== 0 ? 1 : 0;
 
     if(Object.keys(Mouse.isClicked()).length > 0 && Object.keys(map.selectedTile).length === 0) {
-        if (map.getTile(1, map.getCol(coord.x), map.getRow(coord.y)) !== 0) {
+        if (map.getTile(layer, map.getCol(coord.x), map.getRow(coord.y)) !== 0) {
             map.selectedTile.col = map.getCol(coord.x);
             map.selectedTile.row = map.getRow(coord.y);
-            map.selectedTile.tile = map.getTile(1, map.getCol(coord.x), map.getRow(coord.y));
+            map.selectedTile.tile = map.getTile(layer, map.getCol(coord.x), map.getRow(coord.y));
+            map.selectedTile.layer = layer
         }
     } else if (Object.keys(map.selectedTile).length > 0 && Object.keys(Mouse.isClicked()).length > 0) {
-        if (map.getTile(1, map.getCol(coord.x), map.getRow(coord.y)) !== 0) {
+        if (map.getTile(layer, map.getCol(coord.x), map.getRow(coord.y)) !== 0 && layer === 1) {
             alert("Block is not empty. Please choose another that is empty");
         } else {
-            map.setTile(1, map.selectedTile.col, map.selectedTile.row, 0);
-            map.setTile(1, map.getCol(coord.x), map.getRow(coord.y), map.selectedTile.tile);
-            this._drawLayer(1);
+            map.setTile(map.selectedTile.layer, map.selectedTile.col, map.selectedTile.row, 0);
+            map.setTile(map.selectedTile.layer, map.getCol(coord.x), map.getRow(coord.y), map.selectedTile.tile);
+            this._drawLayer(map.selectedTile.layer);
             map.selectedTile = {};
         }
     }
@@ -117,8 +118,5 @@ Game._drawLayer = function (layer) {
 Game.render = function () {
     // draw map background layer
     this._drawLayer(0);
-    // draw game sprites
-    // this.ctx.drawImage(this.hero.image, this.hero.x, this.hero.y);
-    // draw map top layer
     this._drawLayer(1);
 };
